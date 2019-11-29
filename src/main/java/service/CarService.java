@@ -1,7 +1,11 @@
 package service;
 
+import DAO.CarDao;
+import model.Car;
 import org.hibernate.SessionFactory;
 import util.DBHelper;
+
+import java.util.List;
 
 public class CarService {
 
@@ -20,5 +24,15 @@ public class CarService {
         return carService;
     }
 
+    public List<Car> getAllCars() {
+        return new CarDao(sessionFactory.openSession()).getAllCars();
+    }
 
+    public Car buyCar(String brand, String model, String licensePlate) {
+        return new CarDao(sessionFactory.openSession()).buyCar(brand, model, licensePlate);
+    }
+
+    public boolean addCar(Car car) {
+        return new CarDao(sessionFactory.openSession()).addCar(car);
+    }
 }

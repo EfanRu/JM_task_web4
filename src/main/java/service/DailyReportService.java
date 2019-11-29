@@ -1,6 +1,7 @@
 package service;
 
 import DAO.DailyReportDao;
+import model.Car;
 import model.DailyReport;
 import org.hibernate.SessionFactory;
 import util.DBHelper;
@@ -31,5 +32,9 @@ public class DailyReportService {
 
     public DailyReport getLastReport() {
         return null;
+    }
+
+    public void buyCar(Car car) {
+        new DailyReportDao(sessionFactory.openSession()).buyCar(car);
     }
 }

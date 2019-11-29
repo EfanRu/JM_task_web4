@@ -1,6 +1,7 @@
 package servlet;
 
 import com.google.gson.Gson;
+import model.Car;
 import service.CarService;
 
 import javax.servlet.ServletException;
@@ -18,6 +19,18 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        String model = req.getParameter("model");
+        String brand = req.getParameter("brand");
+        String licensePlate = req.getParameter("licensePlate");
+
+        Car car = CarService.getInstance().buyCar(brand, model, licensePlate);
+        Gson gson = new Gson();
+        String json = gson.toJson(car);
+
+        if (car != null) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
 }
