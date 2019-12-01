@@ -1,6 +1,7 @@
 package service;
 
 import DAO.DailyReportDao;
+import model.Car;
 import model.DailyReport;
 import org.hibernate.SessionFactory;
 import util.DBHelper;
@@ -12,6 +13,9 @@ public class DailyReportService {
     private static DailyReportService dailyReportService;
 
     private SessionFactory sessionFactory;
+    private Long earnings;
+    private Long soldCars;
+
 
     private DailyReportService(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -26,6 +30,11 @@ public class DailyReportService {
 
     public List<DailyReport> getAllDailyReports() {
         return new DailyReportDao(sessionFactory.openSession()).getAllDailyReport();
+    }
+
+    public void buyCar(Car c) {
+        soldCars++;
+        earnings += c.getPrice();
     }
 
 
