@@ -39,8 +39,10 @@ public class DailyReportDao {
         List<DailyReport> dailyReports = session.createQuery("FROM DailyReport").list();
 //        for (DailyReport dr : dailyReports) {
 //            session.delete(dr);
-        Query q = session.createQuery("delete from DailyReport");
-        q.executeUpdate();
+        Query q1 = session.createQuery("delete from DailyReport");
+        Query q2 = session.createQuery("delete from Car");
+        q1.executeUpdate();
+        q2.executeUpdate();
 //        }
         session.close();
     }
