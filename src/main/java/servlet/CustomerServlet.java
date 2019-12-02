@@ -15,15 +15,16 @@ public class CustomerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Gson gson = new Gson();
         String json = gson.toJson(CarService.getInstance().getAllCars());
+        resp.setStatus(200);
+        resp.getWriter().println(json);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String model = req.getParameter("model");
         String brand = req.getParameter("brand");
         String licensePlate = req.getParameter("licensePlate");
 
-        Car car = CarService.getInstance().buyCar(brand, model, licensePlate);
+        Car car = CarService.getInstance().buyCar(brand, licensePlate);
         Gson gson = new Gson();
         String json = gson.toJson(car);
 

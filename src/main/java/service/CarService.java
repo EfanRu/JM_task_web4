@@ -28,8 +28,8 @@ public class CarService {
         return new CarDao(sessionFactory.openSession()).getAllCars();
     }
 
-    public Car buyCar(String brand, String model, String licensePlate) {
-        return new CarDao(sessionFactory.openSession()).buyCar(brand, model, licensePlate);
+    public Car buyCar(String brand, String licensePlate) {
+        return new CarDao(sessionFactory.openSession()).buyCar(brand, licensePlate);
     }
 
     public boolean addCar(Car car) {

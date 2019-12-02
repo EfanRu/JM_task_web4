@@ -12,6 +12,9 @@ public class DailyReportService {
 
     private static DailyReportService dailyReportService;
 
+    private Long earnings = 0L;
+    private Long soldCars = 0L;
+
     private SessionFactory sessionFactory;
 
     private DailyReportService(SessionFactory sessionFactory) {
@@ -31,10 +34,21 @@ public class DailyReportService {
 
 
     public DailyReport getLastReport() {
-        return null;
+        return new DailyReportDao(sessionFactory.openSession()).getLastReport();
     }
 
     public void buyCar(Car car) {
-        new DailyReportDao(sessionFactory.openSession()).buyCar(car);
+        earnings += car.getPrice();
+        soldCars++;
+    }
+
+    public void newDay() {
+        new DailyReportDao(sessionFactory.openSession()).newDay(earnings, soldCars);
+        earnings = 0L;
+        soldCars = 0L;
+    }
+
+    public void delete() {
+        new DailyReportDao(sessionFactory.openSession()).delete();
     }
 }

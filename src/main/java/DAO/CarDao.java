@@ -16,18 +16,30 @@ public class CarDao {
         this.session = session;
     }
 
-    public List<Car> getAllCars() {
-        Transaction transaction = session.beginTransaction();
-        List<Car> allCars = session.createQuery("FROM Car").list();
-        transaction.commit();
-        session.close();
-        return allCars;
+    public List<Car> getAllCarsFromDB() throws RuntimeException {
+        return session.createQuery("FROM Car").list();
     }
 
-    public Car buyCar(String brand, String model, String licensePlate) {
+    public List<Car> getAllCars() {
+        try {
+            Transaction transaction = session.beginTransaction();
+            List<Car> cars = getAllCarsFromDB();
+            transaction.commit();
+            return cars;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+
+    public Car buyCar(String brand, String licensePlate) {
         Transaction transaction = session.beginTransaction();
         Car car;
-        if ((car = checkCarInDB(brand, model, licensePlate)) != null) {
+        if ((car = checkCarInDB(brand, licensePlate)) != null) {
+            System.out.println(car);
+
             DailyReportService.getInstance().buyCar(car);
             if (deleteCarFromDB(car) == 0) {
                 session.close();
@@ -43,19 +55,27 @@ public class CarDao {
     }
 
     public boolean addCar(Car car) {
-        Transaction transaction = session.beginTransaction();
-        if (getAllCars().stream().filter(s -> )) {
+        try {
+            Transaction transaction = session.beginTransaction();
+            List<Car> cars = getAllCarsFromDB();
+            if (cars != null
+                    && cars.stream().filter(s -> (s.getBrand()).equals(car.getBrand())).count() >= 10) {
+                return false;
+            }
             session.save(car);
+            transaction.commit();
+            return true;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
         }
-        transaction.commit();
-        session.close();
-        return true;
     }
 
-    private Car checkCarInDB(String brand, String model, String licensePlate) {
-        return (Car) session.createQuery("From Car where brand = :brand, model = :model, licensePlate = :licensePlate")
+    private Car checkCarInDB(String brand, String licensePlate) {
+        return (Car) session.createQuery("From Car where brand = :brand and licensePlate = :licensePlate")
                 .setParameter("brand", brand)
-                .setParameter("model", model)
                 .setParameter("licensePlate", licensePlate).uniqueResult();
     }
 

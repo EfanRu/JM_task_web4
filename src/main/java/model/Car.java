@@ -73,4 +73,19 @@ public class Car {
     public void setPrice(Long price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("Car: id = ")
+                .append(getId())
+                .append(", Brand = ")
+                .append(getBrand())
+                .append(", Model = ")
+                .append(getModel())
+                .append(", price = ")
+                .append(getPrice())
+                .append(";\n")
+                .toString();
+    }
 }
