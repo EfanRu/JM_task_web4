@@ -23,25 +23,21 @@ public class CarDao {
 
     public List<Car> getAllCars() {
         List<Car> result = new ArrayList<>();
-        if (session == null) {
-            return result;
-        }
         try {
             session.beginTransaction();
             return getAllCarsFromDB();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         return result;
     }
 
     public Car buyCar(String brand, String licensePlate) {
         Car car = new Car();
-        if (session == null) {
-            return car;
-        }
         try {
             session.beginTransaction();
             if ((car = checkCarInDB(brand, licensePlate)) != null) {
@@ -58,15 +54,14 @@ public class CarDao {
             e.printStackTrace();
             session.getTransaction().rollback();
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         return car;
     }
 
     public boolean addCar(Car car) {
-        if (session == null) {
-            return false;
-        }
         try {
             session.beginTransaction();
             List<Car> cars = getAllCarsFromDB();
@@ -82,7 +77,9 @@ public class CarDao {
             session.getTransaction().rollback();
             e.printStackTrace();
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         return false;
     }
