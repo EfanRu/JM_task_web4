@@ -6,6 +6,7 @@ import org.hibernate.Transaction;
 import service.DailyReportService;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CarDao {
@@ -21,43 +22,51 @@ public class CarDao {
     }
 
     public List<Car> getAllCars() {
+        List<Car> result = new ArrayList<>();
+        if (session == null) {
+            return result;
+        }
         try {
             session.beginTransaction();
             return getAllCarsFromDB();
         } catch (RuntimeException e) {
             e.printStackTrace();
-            return null;
         } finally {
             session.close();
         }
+        return result;
     }
 
     public Car buyCar(String brand, String licensePlate) {
+        Car car = new Car();
+        if (session == null) {
+            return car;
+        }
         try {
             session.beginTransaction();
-            Car car;
             if ((car = checkCarInDB(brand, licensePlate)) != null) {
                 DailyReportService.getInstance().buyCar(car);
                 if (deleteCarFromDB(car) == 0) {
                     session.getTransaction().rollback();
-                    return null;
                 }
             } else {
                 session.getTransaction().rollback();
-                return null;
             }
             session.getTransaction().commit();
             return car;
         } catch (RuntimeException e) {
             e.printStackTrace();
             session.getTransaction().rollback();
-            return null;
         } finally {
             session.close();
         }
+        return car;
     }
 
     public boolean addCar(Car car) {
+        if (session == null) {
+            return false;
+        }
         try {
             session.beginTransaction();
             List<Car> cars = getAllCarsFromDB();
@@ -72,10 +81,10 @@ public class CarDao {
         } catch (RuntimeException e) {
             session.getTransaction().rollback();
             e.printStackTrace();
-            return false;
         } finally {
             session.close();
         }
+        return false;
     }
 
     private Car checkCarInDB(String brand, String licensePlate) throws RuntimeException {
