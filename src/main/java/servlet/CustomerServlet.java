@@ -33,5 +33,6 @@ public class CustomerServlet extends HttpServlet {
         } else {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
+        resp.getWriter().println(json);
     }
 }

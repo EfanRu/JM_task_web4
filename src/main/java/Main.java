@@ -20,7 +20,6 @@ public class Main {
         context.addServlet(new ServletHolder(newDayServlet), "/newday");
         context.addServlet(new ServletHolder(producerServlet), "/producer");
 
-
         Server server = new Server(8080);
         server.setHandler(context);
 

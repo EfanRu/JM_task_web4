@@ -22,10 +22,8 @@ public class CarDao {
 
     public List<Car> getAllCars() {
         try {
-            Transaction transaction = session.beginTransaction();
-            List<Car> cars = getAllCarsFromDB();
-            transaction.commit();
-            return cars;
+            session.beginTransaction();
+            return getAllCarsFromDB();
         } catch (RuntimeException e) {
             e.printStackTrace();
             return null;
@@ -35,37 +33,44 @@ public class CarDao {
     }
 
     public Car buyCar(String brand, String licensePlate) {
-        Transaction transaction = session.beginTransaction();
-        Car car;
-        if ((car = checkCarInDB(brand, licensePlate)) != null) {
-            System.out.println(car);
-
-            DailyReportService.getInstance().buyCar(car);
-            if (deleteCarFromDB(car) == 0) {
-                session.close();
+        try {
+            session.beginTransaction();
+            Car car;
+            if ((car = checkCarInDB(brand, licensePlate)) != null) {
+                DailyReportService.getInstance().buyCar(car);
+                if (deleteCarFromDB(car) == 0) {
+                    session.getTransaction().rollback();
+                    return null;
+                }
+            } else {
+                session.getTransaction().rollback();
                 return null;
             }
-        } else {
-            session.close();
+            session.getTransaction().commit();
+            return car;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
             return null;
+        } finally {
+            session.close();
         }
-        transaction.commit();
-        session.close();
-        return car;
     }
 
     public boolean addCar(Car car) {
         try {
-            Transaction transaction = session.beginTransaction();
+            session.beginTransaction();
             List<Car> cars = getAllCarsFromDB();
             if (cars != null
                     && cars.stream().filter(s -> (s.getBrand()).equals(car.getBrand())).count() >= 10) {
+                session.getTransaction().rollback();
                 return false;
             }
             session.save(car);
-            transaction.commit();
+            session.getTransaction().commit();
             return true;
         } catch (RuntimeException e) {
+            session.getTransaction().rollback();
             e.printStackTrace();
             return false;
         } finally {
@@ -73,13 +78,13 @@ public class CarDao {
         }
     }
 
-    private Car checkCarInDB(String brand, String licensePlate) {
+    private Car checkCarInDB(String brand, String licensePlate) throws RuntimeException {
         return (Car) session.createQuery("From Car where brand = :brand and licensePlate = :licensePlate")
                 .setParameter("brand", brand)
                 .setParameter("licensePlate", licensePlate).uniqueResult();
     }
 
-    private int deleteCarFromDB(Car car) {
+    private int deleteCarFromDB(Car car) throws RuntimeException {
         return session.createQuery("delete Car where id = :id")
                 .setParameter("id", car.getId())
                 .executeUpdate();
