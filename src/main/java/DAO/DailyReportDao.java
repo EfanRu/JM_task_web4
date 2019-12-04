@@ -24,6 +24,7 @@ public class DailyReportDao {
             return session.createQuery("FROM DailyReport").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
+            session.getTransaction().rollback();
         } finally {
             if (session != null) {
                 session.close();
@@ -39,6 +40,7 @@ public class DailyReportDao {
             return dailyReports.get(dailyReports.size() - 1);
         } catch (RuntimeException e) {
             e.printStackTrace();
+            session.getTransaction().rollback();
         } finally {
             if (session != null) {
                 session.close();
@@ -54,6 +56,7 @@ public class DailyReportDao {
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             e.printStackTrace();
+            session.getTransaction().rollback();
         } finally {
             if (session != null) {
                 session.close();

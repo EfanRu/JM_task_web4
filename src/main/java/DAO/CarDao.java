@@ -28,6 +28,7 @@ public class CarDao {
             return getAllCarsFromDB();
         } catch (RuntimeException e) {
             e.printStackTrace();
+            session.getTransaction().rollback();
         } finally {
             if (session != null) {
                 session.close();
